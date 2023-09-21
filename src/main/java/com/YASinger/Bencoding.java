@@ -1,4 +1,4 @@
-package org.example;
+package com.YASinger;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -70,11 +70,28 @@ public class Bencoding {
         offset++;
         List<Object> list =new ArrayList<>();
         while(fileData[offset] != 'e'){
-            switch (fileData[offset]) {
-                case 'l' -> list.add(readList());
-                case 'd' -> list.add(readMap());
-                case 'i' -> list.add(readInt());
-                case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' -> list.add(readString());
+            switch (fileData[offset]){
+                case 'l':
+                    list.add(readList());
+                    break;
+                case 'd':
+                    list.add(readMap());
+                    break;
+                case 'i':
+                    list.add(readInt());
+                    break;
+                case '9':
+                case '8':
+                case '7':
+                case '6':
+                case '5':
+                case '4':
+                case '3':
+                case '2':
+                case '1':
+                case '0':
+                    list.add(readString());
+                    break;
             }
         }
         offset++;
@@ -90,21 +107,30 @@ public class Bencoding {
         // 读取到第一个'e'为止
         while(offset != length && fileData[offset] != 'e') {
             switch (fileData[offset]) {
-                case 'l' -> {
+                case 'l' :
                     map.put(key, readList());
                     key = null;
-                }
-                case 'd' -> {
+                    break;
+                case 'd' :
                     if(key != null && key.equals("info")) startInfo = offset;
                     map.put(key, readMap());
                     if(key != null && key.equals("info")) endInfo = offset;
                     key = null;
-                }
-                case 'i' -> {
+                    break;
+                case 'i' :
                     map.put(key, readInt());
                     key = null;
-                }
-                case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' -> {
+                    break;
+                case '9':
+                case '8':
+                case '7':
+                case '6':
+                case '5':
+                case '4':
+                case '3':
+                case '2':
+                case '1':
+                case '0':
                     String data = readString();
                     // key为null时，字符串为键，否则为值
                     if (key == null) {
@@ -113,7 +139,7 @@ public class Bencoding {
                         map.put(key, data);
                         key = null;
                     }
-                }
+                break;
             }
         }
         offset++;

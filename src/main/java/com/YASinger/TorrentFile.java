@@ -1,8 +1,8 @@
-package org.example;
+package com.YASinger;
 
+import java.io.IOException;
 import java.security.MessageDigest;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -17,10 +17,11 @@ public class TorrentFile {
     private String creatBy;             //创建人或创建程序信息
     private String comment;             //备注
     private String announce;            //Tracker的url
-    private String announceList;  //备用Tracker的url
-    //private String pieces;              //每个文件块sha1的集成Hash
+    private List<String> announceList;  //备用Tracker的url
+    private String pieces;              //每个文件块sha1的集成Hash
 
-    public TorrentFile(Bencoding bencoding) {
+    public TorrentFile(String filePath) throws IOException {
+        Bencoding bencoding = new Bencoding(filePath);
         bencoding.getTorrentMap().forEach((key,value)->{
             this.fileName = key;
             analyze((Map<String, Object>) value);
@@ -30,11 +31,11 @@ public class TorrentFile {
 
     private void analyze(Map<String, Object> torrentFile){
         announce = (String) torrentFile.get("announce");
-        announceList = "";
+        announceList = new ArrayList<>();
         List<List<String>> announceListL = (List<List<String>>) torrentFile.get("announce-list");
         if (announceListL != null && !announceListL.isEmpty()) {
             announceListL.forEach(announceL->{
-                announceList = announceList + announceL.get(0) + " ";
+                announceList.add(announceL.get(0));
             });
         }
 
@@ -42,7 +43,7 @@ public class TorrentFile {
         creatBy = (String) torrentFile.get("creat by");
 
         Map<String,Object> info = (Map<String, Object>) torrentFile.get("info");
-        //pieces = (String) info.get("pieces");
+        pieces = (String) info.get("pieces");
         name = (String) info.get("name");
         pieceLength = Long.parseLong((String) info.get("piece length"));
 
@@ -81,6 +82,10 @@ public class TorrentFile {
         return hash;
     }
 
+    public String getMagnet() {
+        return "magnet:?xt=urn:btih:"+hash+"&tr="+announce;
+    }
+
     public String getFlag() {
         return flag;
     }
@@ -89,27 +94,13 @@ public class TorrentFile {
         return announce;
     }
 
-    public String getAnnounceList() {
+    public List<String> getAnnounceList() {
         return announceList;
-    }
-
-    public List<String> getAnnounceL() {
-        String announceS = announceList;
-        List<String> announceL = new ArrayList<>();
-        while (announceS.contains("/")) {
-            announceL.add(announceS.substring(0,announceS.indexOf(" ")));
-            announceS = announceS.substring(announceS.indexOf(" ")+1);
-        }
-        return announceL;
     }
 
     public String getCreatBy() {
         return creatBy;
     }
-
-//    public String getPieces() {
-//        return pieces;
-//    }
 
     public String getName() {
         return name;
