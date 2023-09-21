@@ -1,5 +1,6 @@
 # torrentAnalyser
 一个torrent种子解析器，可解析出磁力链接、文件列表、文件总大小等信息。
+
 调用方式
 ```
 TorrentFile torrentFile = new TorrentFile("G:/文件/Hanamonogatari1080p.torrent");
